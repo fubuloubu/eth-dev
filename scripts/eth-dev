@@ -1,0 +1,48 @@
+import argparse
+import IPython
+import json
+from pathlib import Path
+
+from eth_dev import (
+    get_infura_web3_autoloader,
+    unlock_keyfile_to_account,
+    add_signing_middleware,
+)
+
+
+ap = argparse.ArgumentParser("""
+Ethereum Terminal for Python
+""")
+
+ap.add_argument('--network', choices=[
+        'mainnet',
+        'ropsten',
+        'rinkeby',
+        'goerli',
+        'kovan',
+    ], default='rinkeby', help="""
+Network to choose from (default is the Goerli test network).
+""")
+
+ap.add_argument('--setupfile', default=Path.home() / '.eth-dev.json', help="""
+Location of the JSON-formatted Keyfile for your Ethereum dev account and
+Infura Project ID (your login token).
+""")
+
+args = ap.parse_args()
+
+with open(args.setupfile, 'r') as f:
+    config = json.loads(f.read())
+
+# Decrypt account from encrypted keystore
+dev = unlock_keyfile_to_account(config['keystore'], args.setupfile)
+
+# Load Infura-connected web3 provider
+w3 = get_infura_web3_autoloader(args.network, config['project-id'])
+
+# Add middleware for dev acct private key to autosign transactions
+add_signing_middleware(w3, dev)
+
+# Load IPython terminal!
+IPython.start_ipython(argv=[], user_ns={'w3':w3, 'dev':dev})
+
