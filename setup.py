@@ -17,7 +17,7 @@ extras_require = {
 setup(
     name='eth-dev',
     # *IMPORTANT*: Don't manually change the version here. Use the 'bumpversion' utility.
-    version='0.1.0-alpha.1',
+    version='0.1.0-alpha.2',
     description="""Ethereum Development Environment""",
     #long_description_markdown_filename='README.md',
     author='Bryant Eisenbach',
